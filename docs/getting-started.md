@@ -40,5 +40,3 @@ There are two steps for aggregating the results.
 
 ## Want to request a dataset, report a bug or give feedback?
 Please reach out on the [GitHub issues page](https://github.com/AmpliconSuite/AmpliconRepository/issues).
-
-test
