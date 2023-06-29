@@ -3,13 +3,11 @@
 
 ---
 
-This is the documentation for g2nb. [For the general user documentation go here](https://www.g2nb.org).
-
 ### What is AmpliconRepository
 
 AmpliconRepository enables community sharing of focal amplification predictions produced by AmpliconArchitect. AmpliconRepository is intended for academic use only, and not for commercial use. The results shared here are based on analysis of paired-end whole-genome sequencing data. If using predictions hosted here in your own study, please cite the study which initially published the results.
 
-Please see our [Getting Started page](/getting-started) for instructions on uploading results to AmpliconRepository, or running AmpliconArchitect to generate focal amplification predictions from WGS data.
+Please see our [Getting Started page](/en/latest/getting-started/) for instructions on uploading results to AmpliconRepository, or running AmpliconArchitect to generate focal amplification predictions from WGS data.
 
 If you have questions, please contact:
 - Jens Luebeck: jluebeck@ucsd.edu 
