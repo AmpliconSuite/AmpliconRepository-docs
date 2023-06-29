@@ -1,5 +1,5 @@
 
-# AmpliconRepository Documentation
+# AmpliconRepository Docs
 
 ---
 
