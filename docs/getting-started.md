@@ -1,4 +1,4 @@
-## Getting started
+## Getting Started
 
 1. ### Generating focal amplification predictions with AmpliconSuite-pipeline
     * AmpliconSuite-pipeline wraps data preparation steps, AmpliconArchitect, and AmpliconClassifier into a single wrapper that includes all our recommended best practices and input data filtering methods.

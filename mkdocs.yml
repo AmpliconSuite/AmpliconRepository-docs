@@ -17,7 +17,7 @@ markdown_extensions:
   
 nav:
   - 'index.md'
-  - 'g2nb Homepage': 'https://ampliconrepository.org'
+  - 'AmpliconRepository Homepage': 'https://ampliconrepository.org'
   - Documentation:
     - 'getting-started.md'
   - 'faq.md'
