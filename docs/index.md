@@ -21,6 +21,9 @@ or reach out to us on the [GitHub issues page](https://github.com/AmpliconSuite/
 ## Additional Resources
 
 - [**AmpliconRepository Homepage**](https://ampliconrepository.org/)
-- [**GitHub Organization**](https://ampliconrepository.org/)
-- [**Bafna Lab**](http://proteomics.ucsd.edu/vbafna/)
+- [**GitHub Organization**](https://github.com/AmpliconSuite)
+  - Browse the available tools in AmpliconSuite 
+- [**GenePattern**](https://cloud.genepattern.org/gp/pages/login.jsf)
+  - Run AmpliconSuite-pipeline in the cloud.  
 - [**Mesirov Lab**](https://mesirovlab.org/)
+  - Learn more about the research in the Mesirov lab. 
