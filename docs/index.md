@@ -12,7 +12,7 @@ Please see our [Getting Started page](/en/latest/getting-started/) for instructi
 If you have questions, please contact:
 - Jens Luebeck: jluebeck@ucsd.edu 
 - Vineet Bafna: vbafna@ucsd.edu 
-- Forrest Kim: f1kim@health.ucsd.edu 
+- Ted Liefeld: jliefeld@cloud.ucsd.edu  
 - Michael Reich: mmreich@cloud.ucsd.edu
 
 or reach out to us on the [GitHub issues page](https://github.com/AmpliconSuite/AmpliconRepository/issues).
@@ -20,7 +20,6 @@ or reach out to us on the [GitHub issues page](https://github.com/AmpliconSuite/
 
 ## Additional Resources
 
-- [**AmpliconRepository Homepage**](https://ampliconrepository.org/)
 - [**GitHub Organization**](https://github.com/AmpliconSuite)
   - Browse the available tools in AmpliconSuite 
 - [**GenePattern**](https://cloud.genepattern.org/gp/pages/login.jsf)
