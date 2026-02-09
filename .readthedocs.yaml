@@ -1,0 +1,23 @@
+site_name: Documentation
+theme: 
+  name: 'rtd-dropdown'
+  collapse_by_default: true
+repo_url: https://github.com/AmpliconSuite/AmpliconRepository-docs
+extra:
+  version: 1.0
+site_favicon: favicon/favicon.ico
+plugins:
+  - search
+extra_css:
+  - css/extra.css
+markdown_extensions:
+  - admonition
+#     - toc:
+#         baselevel: 5
+  
+nav:
+  - 'index.md'
+  - 'AmpliconRepository Homepage': 'https://ampliconrepository.org'
+  - Documentation:
+    - 'getting-started.md'
+  - 'faq.md'
