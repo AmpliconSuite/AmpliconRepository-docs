@@ -1,23 +1,21 @@
-site_name: Documentation
-theme: 
-  name: 'rtd-dropdown'
-  collapse_by_default: true
-repo_url: https://github.com/AmpliconSuite/AmpliconRepository-docs
-extra:
-  version: 1.0
-site_favicon: favicon/favicon.ico
-plugins:
-  - search
-extra_css:
-  - css/extra.css
-markdown_extensions:
-  - admonition
-#     - toc:
-#         baselevel: 5
-  
-nav:
-  - 'index.md'
-  - 'AmpliconRepository Homepage': 'https://ampliconrepository.org'
-  - Documentation:
-    - 'getting-started.md'
-  - 'faq.md'
+# Read the Docs configuration file for MkDocs projects
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+# Required
+version: 2
+
+# Set the OS, Python version and other tools you might need
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.12"
+
+# Build documentation in the "docs/" directory with MkDocs
+mkdocs:
+  configuration: mkdocs.yml
+
+# Optionally declare the Python requirements required to build your documentation
+# See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
+python:
+  install:
+    - requirements: docs/requirements.txt
