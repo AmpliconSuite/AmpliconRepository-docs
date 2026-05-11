@@ -1,68 +1,112 @@
 # Getting Started
 
-### 1. Generate focal amplification predictions with AmpliconSuite-pipeline
+Sharing and exploring focal amplification data on [AmpliconRepository.org](https://ampliconrepository.org) is designed to be straightforward.
 
-AmpliconSuite-pipeline wraps data preparation, AmpliconArchitect, and AmpliconClassifier into a single workflow with our recommended best practices and filtering methods.
+**TL;DR for Cohort Users:** If you have run [AmpliconSuite-pipeline](https://github.com/AmpliconSuite/AmpliconSuite-pipeline) on a cohort of samples, simply package the resulting output directory into a `.tar.gz` or `.zip` file and upload it. The backend will automatically handle the discovery and aggregation of all samples in your cohort.
 
-* For usage options and documentation, see the [AmpliconSuite-pipeline GitHub page](https://github.com/AmpliconSuite/AmpliconSuite-pipeline)
-* After running AmpliconSuite-pipeline, you'll have a collection of output files for one or more samples
+---
 
-### 2. Package your results for upload
+### 1. Generate focal amplification predictions
 
-Once you have one or more samples processed with AmpliconSuite-pipeline, package the output files into a single `.tar.gz` archive.
+Data on AmpliconRepository typically comes from the **AmpliconSuite** ecosystem. The recommended workflow is to use [AmpliconSuite-pipeline](https://github.com/AmpliconSuite/AmpliconSuite-pipeline), which integrates:
+* **Data Preparation** (CNV calling via CNVkit or other tools)
+* **AmpliconArchitect (AA)** (Focal amplification reconstruction)
+* **AmpliconClassifier (AC)** (Classification of amplicon types like ecDNA or BFB)
 
-**Your archive should include:**
-* AmpliconArchitect (AA) output directories
-* AmpliconClassifier (AC) output directories  
-* CNVkit output directories (or whole-genome copy number bed files)
-* *(Optional)* A directory of auxiliary files (e.g., FISH images) with an `AUX_DIR` marker file in the top level
+Once your pipeline runs are complete, you will have directories containing `_AA_results`, `_classification`, and `_cnvkit_output`.
 
-**Important:** Do not include original `.bam` or `.fastq` files in your archive.
+---
 
-**To create your archive:**
+### 2. Package your results
+
+To upload data, you must package your results into one or more `.tar.gz` or `.zip` archives. When you upload these files, **the AmpliconRepository backend automatically discovers and aggregates your data.**
+
+The backend is designed to be flexible: it walks your directory tree and identifies samples based on folder suffixes and the contents of your classification tables.
+
+#### Key Components
+For the backend to correctly link your data, ensure the following components are present in your archive:
+
+1.  **Authoritative Sample List:** The backend uses **`*_result_table.tsv`** files (produced by AmpliconClassifier) as the source of truth. It will include every sample listed in these tables that it can find matching data for.
+2.  **AA Results:** Directories ending in **`_AA_results`** containing the reconstructions.
+3.  **Classification Data:** Directories or files containing the AmpliconClassifier classification outputs.
+4.  **CNV Calls:** Directories ending in **`_cnvkit_output`** (or `_cnvkit_outputs`) containing the `.bed` files, or generally speaking any directory(s) containing the whole genome CNV call files named like [sample_name]_CNV_CALLS.bed
+
+#### Flexible Organizational Styles
+You can organize your files in the way that best fits your workflow:
+
+*   **Per-Sample Organization:** Each sample has its own set of directories (e.g., `sample1_AA_results/`, `sample1_classification/`, etc.).
+*   **Project-Wide Organization:** You can have a single, consolidated classification directory for the entire project, while keeping AA and CNVkit results in separate folders.
+*   **Nested Folders:** The backend will recursively search through your archive, so you can group samples into subfolders (e.g., by cohort or batch).
+
+#### Example Structure (Mixed Style)
+The following is just one example of a valid hierarchy:
+
+```text
+my_study/
+├── cohort_A/
+│   ├── sample1_AA_results/
+│   ├── sample1_cnvkit_output/
+│   ├── sample2_AA_results/
+│   └── sample2_cnvkit_output/
+└── project_classification/      <-- Consolidated classifications
+    ├── sample1_result_table.tsv
+    ├── sample2_result_table.tsv
+    └── ...
+```
+
+#### How to create your archive
+Package your results from the command line. **Important:** Do **not** include original `.bam`, `.fastq`, or `.cram` files.
+
 ```bash
-tar --exclude='*.gz' --exclude='*.bam*' -czf project_name.tar.gz your_consolidated_directory/
+# Packaging command (run from outside your data directory)
+tar --exclude='*.gz' --exclude='*.bam*' --exclude='*.cram*' -czf my_project.tar.gz my_study/
 ```
 
-This command will:
-* Package your directory into a compressed `.tar.gz` file
-* Automatically exclude `.bam` files and pre-compressed `.gz` files
-* Preserve the directory structure needed by AmpliconRepository
+---
 
-**Example directory structure before packaging:**
-```
-my_project/
-├── sample1_AA/
-├── sample1_classification/
-├── sample1_CNVkit/
-├── sample2_AA/
-├── sample2_classification/
-└── sample2_CNVkit/
-```
+### 3. Create or Update a Project
 
-### 3. Upload to AmpliconRepository
+Once your archives are ready, head to [AmpliconRepository.org](https://ampliconrepository.org).
 
-1. **Log in** to [AmpliconRepository.org](https://ampliconrepository.org)
-2. Click your **username** in the upper-right corner and select **"New Project"**
-3. **Fill out the project form:**
-   * **Project Name:** A descriptive title for your project
-   * **Description:** Explain the data source and what it represents. Include citation information if relevant
-   * **Upload:** Select your `.tar.gz` file
-4. **Submit** your project
+#### Creating a New Project
+1. **Log in** and select **"New Project"** from your account menu.
+2. **Project Name & Alias:** Choose a descriptive name. You can also set a **Project Alias** (e.g., `my-study-2024`) to create a clean, shareable URL: `ampliconrepository.org/project/my-study-2024/`.
+3. **Upload Archives:** You can select **multiple** `.tar.gz` files at once. The server will aggregate them into a single project automatically.
+4. **Submit:** After clicking submit, you will be redirected to the project page. 
 
-**Note:** Large files (>500MB) may take several minutes to upload. For files larger than 1GB, please [contact the site administrators](https://github.com/AmpliconSuite/AmpliconRepository/issues) for assistance.
+**Note:** Large projects are processed in the **background**. You can leave the page or close your browser; the project will update automatically once processing is complete.
 
-### 4. Add metadata (optional)
+#### Updating or Adding Samples to a Project
+You can update your project or add new data at any time by selecting **"Edit Project"** from the project page.
 
-You can optionally upload a metadata file (CSV, TSV, or XLSX) containing sample annotations:
-* First column must be `sample_name`
-* Second column must be `cancer_type`
-* Additional columns can include any sample-specific metadata
+When adding data, you can choose from three modes:
+*   **Append Samples (Add Data):** Use this to add new `.tar.gz` files to your existing project. The new samples will be aggregated alongside your current data. This is the standard way to grow a project as more samples are processed.
+*   **Replace Project:** Use this to wipe all current samples and replace them entirely with the newly uploaded files.
+*   **Re-aggregate:** Re-process the existing data on the server. This is useful if you want to apply new metadata (like sample renaming) to data that is already uploaded without re-uploading the archives.
 
-See the upload page for a template and detailed formatting requirements.
+**Steps to add samples:**
+1. Navigate to your project page and click the **Edit (pencil icon)** button.
+2. Under the **"Upload"** section, select your new `.tar.gz` or `.zip` archives.
+3. Ensure the **"Append Samples"** mode is selected (this is usually the default).
+4. Click **Submit**. The backend will process the new samples and add them to the project view once complete.
+
+
+---
+
+### 4. Add Metadata & Rename Samples
+
+You can upload a metadata file (CSV, TSV, or XLSX) to annotate your samples.
+
+**Metadata Requirements:**
+* **First Column:** Must be `sample_name` (must match the names in your uploaded data).
+* **Second Column:** Must be `cancer_type`.
+* **Additional Columns:** Any other annotations (Tissue, Stage, Treatment, etc.).
+
+#### Deep Renaming with Aliases
+If your metadata includes a column named **`sample_name_alias`**, the repository can perform a "Deep Rename." This physically renames the samples in the database and across all internal files (tables, logs, etc.) to match your aliases, making the project much easier for others to navigate.
 
 ---
 
 ## Need help?
 
-Have questions, want to request a dataset, or report an issue? Please reach out on our [GitHub issues page](https://github.com/AmpliconSuite/AmpliconRepository/issues). We're very responsive!
+If you encounter issues during upload or have questions about data formatting, please reach out on our [GitHub issues page](https://github.com/AmpliconSuite/AmpliconRepository/issues). We are happy to help!
