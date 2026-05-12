@@ -34,6 +34,7 @@ The `samples/` directory contains a subdirectory for every sample in the project
 ### Consolidated Analysis: `consolidated_classification/`
 
 This directory aggregates results from **AmpliconClassifier (AC)** across all samples in the project, using the project name as a prefix.
+More about these files is available from the [AC GitHub Readme](https://github.com/AmpliconSuite/AmpliconClassifier/blob/main/README.md#3-outputs).
 
 *   **`*_result_table.tsv`**: The authoritative list of all focal amplifications identified across the project.
 *   **`*_amplicon_classification_profiles.tsv`**: Detailed profiles for each identified amplicon.
