@@ -20,6 +20,7 @@ nav:
   - 'AmpliconRepository Homepage': 'https://ampliconrepository.org'
   - Documentation:
     - 'getting-started.md'
+    - 'api.md'
     - 'analysis-tools.md'
     - 'project-structure.md'
   - 'faq.md'
