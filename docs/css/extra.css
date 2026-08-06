@@ -15,16 +15,26 @@
     overflow-x: auto;
 }
 
-/* Code blocks keep their own scrollbar (never wrap a shell command silently),
-   but should not be able to push the page sideways. */
-.rst-content div[class^="highlight"],
 .rst-content pre {
     max-width: 100%;
-    overflow-x: auto;
 }
 
-/* Slightly tighter code so long paths fit without scrolling. */
-.rst-content div[class^="highlight"] pre {
+/* The theme styles inline code with `.rst-content code { white-space: nowrap }`,
+   and that selector (0,1,1) also matches the <code> inside a <pre>, where it
+   outranks mkdocs' own `pre code { white-space: pre }` (0,0,2). The result is
+   that every fenced block collapses onto one line — ASCII trees and
+   backslash-continued commands alike. `.rst-content pre code` (0,1,2) wins the
+   cascade back. The rest restores normal block-code appearance, which the same
+   inline-code rule was overriding (white background, tight padding). */
+.rst-content pre code {
+    white-space: pre;
+    word-wrap: normal;
+    display: block;
+    overflow-x: auto;
+    padding: 12px;
     font-size: 12px;
     line-height: 1.4;
+    color: #333;
+    background: #f8f8f8;
+    border: 1px solid #e1e4e5;
 }
