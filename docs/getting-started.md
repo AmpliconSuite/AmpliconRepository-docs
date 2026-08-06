@@ -15,6 +15,10 @@ Data on AmpliconRepository typically comes from the **AmpliconSuite** ecosystem.
 
 Once your pipeline runs are complete, you will have directories containing `_AA_results`, `_classification`, and `_cnvkit_output`.
 
+**Long reads?** [CoRAL](https://github.com/AmpliconSuite/CoRAL) reconstructions are also accepted. Run
+AmpliconClassifier (version 2.0.0 or newer) on your CoRAL output to produce the `_classification`
+directory, then package as described in [CoRAL results](#coral-long-read-results) below.
+
 ---
 
 ### 2. Package your results
@@ -27,7 +31,10 @@ The backend is designed to be flexible: it walks your directory tree and identif
 For the backend to correctly link your data, ensure the following components are present in your archive:
 
 1.  **Authoritative Sample List:** The backend uses **`*_result_table.tsv`** files (produced by AmpliconClassifier) as the source of truth. It will include every sample listed in these tables that it can find matching data for.
-2.  **AA Results:** Directories ending in **`_AA_results`** containing the reconstructions.
+2.  **Reconstructions:** Directories ending in **`_AA_results`** containing the AmpliconArchitect
+    reconstructions. A **CoRAL** per-sample directory works too — it is recognized by the
+    **`*_summary.txt`** / **`*_amplicon_summary.txt`** file it contains, so it does not need to be
+    renamed to `_AA_results`.
 3.  **Classification Data:** Directories or files containing the AmpliconClassifier classification outputs.
 4.  **CNV Calls:** Directories ending in **`_cnvkit_output`** (or `_cnvkit_outputs`) containing the `.bed` files, or generally speaking any directory(s) containing the whole genome CNV call files named like [sample_name]_CNV_CALLS.bed
 
@@ -55,12 +62,87 @@ my_study/
 ```
 
 #### How to create your archive
-Package your results from the command line. **Important:** Do **not** include original `.bam`, `.fastq`, or `.cram` files.
+Package your results from the command line, running from *outside* your data directory.
+**Important:** do **not** include original `.bam`, `.fastq`, or `.cram` files.
 
 ```bash
-# Packaging command (run from outside your data directory)
-tar --exclude='*.gz' --exclude='*.bam*' --exclude='*.cram*' -czf my_project.tar.gz my_study/
+tar -czf my_project.tar.gz \
+    --exclude='*.bam*' \
+    --exclude='*.cram*' \
+    --exclude='*.fastq*' \
+    --exclude='*.fq*' \
+    my_study/
 ```
+
+Or, if you prefer `.zip`:
+
+```bash
+zip -rq my_project.zip my_study/ \
+    -x '*.bam*' '*.cram*' '*.fastq*' '*.fq*'
+```
+
+#### CoRAL (long-read) results
+
+CoRAL output is packaged the same way, with two things to watch for.
+
+**Directory layout.** CoRAL writes everything for a sample into one flat directory. Move the CNVkit segment file into a
+`cnvkit_output/` subdirectory so the backend can find it — copy-number files sitting loose next to
+the reconstructions are **not** picked up:
+
+```text
+SAMPLE/
+├── SAMPLE_amplicon1_graph.txt
+├── SAMPLE_amplicon1_cycles.txt
+├── SAMPLE_amplicon1_graph.png       (and .pdf)
+├── SAMPLE_amplicon1_cycles.png      (and .pdf)
+├── SAMPLE_amplicon_summary.txt      <-- marks this as a results directory
+├── SAMPLE_CNV_SEEDS.bed
+├── SAMPLE_reconstruct.log
+└── cnvkit_output/
+    └── SAMPLE.cns                   <-- CNV calls
+```
+
+!!! note
+    The backend converts the plain `.cns` into the `_CNV_CALLS.bed` it displays. The
+    `.call.cns` and `.bintest.cns` files are not used, and `SAMPLE_cnvkit_output/` works
+    just as well as a bare `cnvkit_output/`.
+
+**Leave out the intermediates.** A finished CoRAL run keeps several large working files that AmpliconRepository never reads. Excluding
+them is worth the effort — on one test sample the archive dropped from **158 MB to under 500 KB**:
+
+| Pattern | What it is | Typical size |
+|---|---|---|
+| `*_chimeric_alignments.pickle` | cached chimeric alignments | 100s of MB |
+| `*.cnn` | CNVkit target / antitarget coverage | 10s of MB |
+| `*.cnr` | CNVkit per-bin copy ratios | 10s of MB |
+| `*-tmp.bed` | CNVkit reference scratch files | 10s of MB |
+| `models/` | Pyomo/Gurobi solver models and logs | varies |
+
+```bash
+tar -czf my_project.tar.gz \
+    --exclude='*.pickle' \
+    --exclude='*.cnn' \
+    --exclude='*.cnr' \
+    --exclude='*-tmp.bed' \
+    --exclude='models' \
+    --exclude='*.bam*' \
+    --exclude='*.cram*' \
+    --exclude='*.fastq*' \
+    --exclude='*.fq*' \
+    my_study/
+```
+
+Or with `zip`:
+
+```bash
+zip -rq my_project.zip my_study/ \
+    -x '*.pickle' '*.cnn' '*.cnr' '*-tmp.bed' '*/models/*' \
+       '*.bam*' '*.cram*' '*.fastq*' '*.fq*'
+```
+
+Keep the `_reconstruct.log` — it is compressed on the server and carries the CoRAL version. And
+remember that AmpliconClassifier still has to be run on the CoRAL output: the resulting
+`*_result_table.tsv` is what the backend uses as its list of samples.
 
 ---
 

@@ -1,0 +1,30 @@
+/* Referenced from mkdocs.yml (extra_css). */
+
+/* The rtd/rtd-dropdown theme caps the content column at 800px, which puts a
+   horizontal scrollbar on nearly every shell command and wide table. Give the
+   text a wider column but keep a comfortable measure for prose. */
+.wy-nav-content {
+    max-width: 1100px;
+}
+
+/* Wide tables scroll inside their own box instead of widening the page. */
+.rst-content table {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Code blocks keep their own scrollbar (never wrap a shell command silently),
+   but should not be able to push the page sideways. */
+.rst-content div[class^="highlight"],
+.rst-content pre {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Slightly tighter code so long paths fit without scrolling. */
+.rst-content div[class^="highlight"] pre {
+    font-size: 12px;
+    line-height: 1.4;
+}
