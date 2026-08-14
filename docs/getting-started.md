@@ -1,4 +1,4 @@
-# Getting Started
+# Adding Results to AmpliconRepository
 
 Sharing and exploring focal amplification data on [AmpliconRepository.org](https://ampliconrepository.org) is designed to be straightforward.
 
