@@ -1,6 +1,8 @@
-# About AmpliconRepository
+# What is AmpliconRepository? {.overview-title}
 
-AmpliconRepository enables community sharing of focal amplification predictions produced by [AmpliconArchitect](https://github.com/virajbdeshpande/AmpliconArchitect). It provides a centralized platform to explore, visualize, and download ecDNA and other focal amplification data across thousands of samples.
+AmpliconRepository is a community resource for sharing and exploring focal amplifications detected in cancer whole-genome sequencing (WGS) datasets.
+
+Repository results are generated with tools in the [AmpliconSuite](https://github.com/AmpliconSuite) toolkit: [AmpliconArchitect](https://github.com/AmpliconSuite/AmpliconSuite-pipeline) reconstructs focal amplifications from short-read WGS data, [CoRAL](https://github.com/AmpliconSuite/CoRAL) reconstructs them from long-read WGS data, and [AmpliconClassifier](https://github.com/AmpliconSuite/AmpliconClassifier) classifies the reconstructed structures. AmpliconRepository brings these reconstructions, classifications, copy-number profiles, and genomic annotations together in a centralized platform for searching, visualization, and download.
 
 **Key Features:**
 
@@ -9,26 +11,22 @@ AmpliconRepository enables community sharing of focal amplification predictions 
 *   **Bulk Data Access:** Download high-volume sample data in batches, with background processing and email delivery for large requests.
 *   **Background Processing:** Upload large datasets and manage project versions with automatic background aggregation.
 
----
+## Navigation
 
-### Navigation
+*   [**Adding Results to AmpliconRepository**](getting-started.md): Instructions on packaging and uploading your data.
+*   [**API**](api.md): List public projects, inspect metadata, and download project archives from the command line.
+*   [**Analysis Tools**](analysis-tools.md): Detailed guide on using the search, filtering, and graph analysis tools.
+*   [**Project Archive Structure**](project-structure.md): Description of the standardized archive created automatically from uploaded results.
+*   [**FAQ**](faq.md): Common questions and troubleshooting.
+*   [**Team & Contributors**](contributors.md): The people who have developed and guided AmpliconRepository.
 
-*   [**Adding Results to AmpliconRepository**](/en/latest/getting-started/): Instructions on packaging and uploading your data.
-*   [**API**](/en/latest/api/): List public projects, inspect metadata, and download project archives from the command line.
-*   [**Analysis Tools**](/en/latest/analysis-tools/): Detailed guide on using the search, filtering, and graph analysis tools.
-*   [**Project Archive Structure**](/en/latest/project-structure/): Description of the standardized archive created automatically from uploaded results.
-*   [**FAQ**](/en/latest/faq/): Common questions and troubleshooting.
-*   [**Team & Contributors**](/en/latest/contributors/): The people who have developed and guided AmpliconRepository.
-
----
-
-### Contact & Support
+## Contact & Support
 
 For technical questions, bug reports, or feature requests, please use the [GitHub issues page](https://github.com/AmpliconSuite/AmpliconRepository/issues). For direct inquiries, contact:
 
 - Jens Luebeck: jluebeck@ucsd.edu
 - Vineet Bafna: vbafna@ucsd.edu
 
-See [**Team & Contributors**](/en/latest/contributors/) for the people who have built and guided AmpliconRepository.
+See [**Team & Contributors**](contributors.md) for the people who have built and guided AmpliconRepository.
 
 View the [**AmpliconSuite GitHub Organization**](https://github.com/AmpliconSuite) to learn more about the available tools in AmpliconSuite.

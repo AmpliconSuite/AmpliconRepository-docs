@@ -1,26 +1,59 @@
-site_name: Documentation
-theme: 
-  name: 'rtd-dropdown'
-  collapse_by_default: true
-repo_url: https://github.com/AmpliconSuite/AmpliconRepository-docs
+site_name: AmpliconRepository Docs
+site_url: https://docs.ampliconrepository.org/
+site_description: Documentation for contributing, exploring, and downloading focal amplification data from AmpliconRepository.
+
+theme:
+  name: material
+  logo: img/ampliconsuite-icon.png
+  favicon: img/ampliconsuite-icon.png
+  font: false
+  features:
+    - content.action.edit
+    - content.code.copy
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    scheme: default
+    primary: custom
+    accent: custom
+
+repo_url: https://github.com/AmpliconSuite/AmpliconRepository
+repo_name: AmpliconSuite/AmpliconRepository
+edit_uri_template: https://github.com/AmpliconSuite/AmpliconRepository-docs/edit/main/docs/{path}
+
 extra:
-  version: 1.0
+  homepage: https://ampliconrepository.org/
+  version: "1.0"
+
+copyright: AmpliconRepository documentation
+
 plugins:
   - search
+
 extra_css:
   - css/extra.css
+
 markdown_extensions:
   - admonition
-#     - toc:
-#         baselevel: 5
-  
+  - attr_list
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
 nav:
-  - 'index.md'
-  - 'AmpliconRepository Homepage': 'https://ampliconrepository.org'
-  - Documentation:
-    - 'Adding Results to AmpliconRepository': 'getting-started.md'
-    - 'api.md'
-    - 'analysis-tools.md'
-    - 'Project Archive Structure': 'project-structure.md'
-  - 'faq.md'
-  - 'Team & Contributors': 'contributors.md'
+  - Overview: index.md
+  - Get started:
+      - Adding Results: getting-started.md
+      - Project Archive Structure: project-structure.md
+  - Use the repository:
+      - API Reference: api.md
+      - Analysis Tools: analysis-tools.md
+  - Help & project:
+      - FAQ: faq.md
+      - Team & Contributors: contributors.md
+  - AmpliconRepository Homepage: https://ampliconrepository.org/

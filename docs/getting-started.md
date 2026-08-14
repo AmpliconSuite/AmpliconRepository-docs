@@ -2,13 +2,50 @@
 
 Sharing and exploring focal amplification data on [AmpliconRepository.org](https://ampliconrepository.org) is designed to be straightforward.
 
-**TL;DR for Cohort Users:** If you have run [AmpliconSuite-pipeline](https://github.com/AmpliconSuite/AmpliconSuite-pipeline) on a cohort of samples, simply package the resulting output directory into a `.tar.gz` or `.zip` file and upload it. The backend will automatically handle the discovery and aggregation of all samples in your cohort.
+## TL;DR: Package and upload your results
 
----
+For **AmpliconArchitect (AA)** results produced by
+[AmpliconSuite-pipeline](https://github.com/AmpliconSuite/AmpliconSuite-pipeline), run this from
+the directory containing your results folder:
 
-### 1. Generate focal amplification predictions
+```bash
+tar -czf my_project.tar.gz \
+    --exclude='*.bam*' \
+    --exclude='*.cram*' \
+    --exclude='*.fastq*' \
+    --exclude='*.fq*' \
+    my_study/
+```
+
+The archive should include the pipeline's `_AA_results`, `_classification`, and
+`_cnvkit_output` directories.
+
+For **CoRAL** results, run AmpliconClassifier 2.0.0 or newer first, place each sample's
+CNVkit `.cns` file in a `cnvkit_output/` subdirectory, and then package the study while
+leaving out large intermediate files:
+
+```bash
+tar -czf my_project.tar.gz \
+    --exclude='*.pickle' \
+    --exclude='*.cnn' \
+    --exclude='*.cnr' \
+    --exclude='*-tmp.bed' \
+    --exclude='models' \
+    --exclude='*.bam*' \
+    --exclude='*.cram*' \
+    --exclude='*.fastq*' \
+    --exclude='*.fq*' \
+    my_study/
+```
+
+Upload the resulting `.tar.gz` through the AmpliconRepository project page. A `.zip`
+archive is also accepted. The backend searches the full archive and aggregates all the
+samples it discovers, so the files do not need to follow one rigid directory layout.
+
+## 1. Generate focal amplification predictions
 
 Data on AmpliconRepository typically comes from the **AmpliconSuite** ecosystem. The recommended workflow is to use [AmpliconSuite-pipeline](https://github.com/AmpliconSuite/AmpliconSuite-pipeline), which integrates:
+
 * **Data Preparation** (CNV calling via CNVkit or other tools)
 * **AmpliconArchitect (AA)** (Focal amplification reconstruction)
 * **AmpliconClassifier (AC)** (Classification of amplicon types like ecDNA or BFB)
@@ -19,15 +56,13 @@ Once your pipeline runs are complete, you will have directories containing `_AA_
 AmpliconClassifier (version 2.0.0 or newer) on your CoRAL output to produce the `_classification`
 directory, then package as described in [CoRAL results](#coral-long-read-results) below.
 
----
-
-### 2. Package your results
+## 2. Package your results
 
 To upload data, you must package your results into one or more `.tar.gz` or `.zip` archives. When you upload these files, **the AmpliconRepository backend automatically discovers and aggregates your data.**
 
 The backend is designed to be flexible: it walks your directory tree and identifies samples based on folder suffixes and the contents of your classification tables.
 
-#### Key Components
+### Key Components
 For the backend to correctly link your data, ensure the following components are present in your archive:
 
 1.  **Authoritative Sample List:** The backend uses **`*_result_table.tsv`** files (produced by AmpliconClassifier) as the source of truth. It will include every sample listed in these tables that it can find matching data for.
@@ -38,15 +73,20 @@ For the backend to correctly link your data, ensure the following components are
 3.  **Classification Data:** Directories or files containing the AmpliconClassifier classification outputs.
 4.  **CNV Calls:** Directories ending in **`_cnvkit_output`** (or `_cnvkit_outputs`) containing the `.bed` files, or generally speaking any directory(s) containing the whole genome CNV call files named like [sample_name]_CNV_CALLS.bed
 
-#### Flexible Organizational Styles
-You can organize your files in the way that best fits your workflow:
+### Flexible Organizational Styles
+
+The examples below show two convenient ways to organize a project, but neither layout is
+required. The backend searches recursively for the required result files, so flatter,
+more deeply nested, or otherwise less structured archives are also accepted.
 
 *   **Per-Sample Organization:** Each sample has its own set of directories (e.g., `sample1_AA_results/`, `sample1_classification/`, etc.).
 *   **Project-Wide Organization:** You can have a single, consolidated classification directory for the entire project, while keeping AA and CNVkit results in separate folders.
 *   **Nested Folders:** The backend will recursively search through your archive, so you can group samples into subfolders (e.g., by cohort or batch).
 
-#### Example Structure (Mixed Style)
-The following is just one example of a valid hierarchy:
+### Example: Project-wide classifications
+
+In this layout, AA and CNVkit results are grouped by cohort while the classification
+results are collected in one project-level directory:
 
 ```text
 my_study/
@@ -61,7 +101,29 @@ my_study/
     └── ...
 ```
 
-#### How to create your archive
+### Alternative: Results grouped by sample
+
+Keeping every result directory alongside its sample is equally valid:
+
+```text
+my_study/
+├── sample1/
+│   ├── sample1_AA_results/
+│   ├── sample1_classification/
+│   │   └── sample1_result_table.tsv
+│   └── sample1_cnvkit_output/
+└── sample2/
+    ├── sample2_AA_results/
+    ├── sample2_classification/
+    │   └── sample2_result_table.tsv
+    └── sample2_cnvkit_output/
+```
+
+These are illustrative layouts, not templates that uploads must match. The required
+components may be distributed elsewhere in the archive as long as the backend can
+identify and associate them by sample name.
+
+### How to create your archive
 Package your results from the command line, running from *outside* your data directory.
 **Important:** do **not** include original `.bam`, `.fastq`, or `.cram` files.
 
@@ -81,7 +143,7 @@ zip -rq my_project.zip my_study/ \
     -x '*.bam*' '*.cram*' '*.fastq*' '*.fq*'
 ```
 
-#### CoRAL (long-read) results
+### CoRAL (long-read) results
 
 CoRAL output is packaged the same way, with two things to watch for.
 
@@ -108,7 +170,7 @@ SAMPLE/
     just as well as a bare `cnvkit_output/`.
 
 **Leave out the intermediates.** A finished CoRAL run keeps several large working files that AmpliconRepository never reads. Excluding
-them is worth the effort — on one test sample the archive dropped from **158 MB to under 500 KB**:
+them can reduce an archive from **hundreds of MB to under 1 MB**:
 
 | Pattern | What it is | Typical size |
 |---|---|---|
@@ -144,13 +206,11 @@ Keep the `_reconstruct.log` — it is compressed on the server and carries the C
 remember that AmpliconClassifier still has to be run on the CoRAL output: the resulting
 `*_result_table.tsv` is what the backend uses as its list of samples.
 
----
-
-### 3. Create or Update a Project
+## 3. Create or Update a Project
 
 Once your archives are ready, head to [AmpliconRepository.org](https://ampliconrepository.org).
 
-#### Creating a New Project
+### Creating a New Project
 1. **Log in** and select **"New Project"** from your account menu.
 2. **Project Name & Alias:** Choose a descriptive name. You can also set a **Project Alias** (e.g., `my-study-2024`) to create a clean, shareable URL: `ampliconrepository.org/project/my-study-2024/`.
 3. **Upload Archives:** You can select **multiple** `.tar.gz` files at once. The server will aggregate them into a single project automatically.
@@ -158,7 +218,7 @@ Once your archives are ready, head to [AmpliconRepository.org](https://ampliconr
 
 **Note:** Large projects are processed in the **background**. You can leave the page or close your browser; the project will update automatically once processing is complete.
 
-#### Updating or Adding Samples to a Project
+### Updating or Adding Samples to a Project
 You can update your project or add new data at any time by selecting **"Edit Project"** from the project page.
 
 When adding data, you can choose from three modes:
@@ -173,9 +233,7 @@ When adding data, you can choose from three modes:
 4. Click **Submit**. The backend will process the new samples and add them to the project view once complete.
 
 
----
-
-### 4. Add Metadata & Rename Samples
+## 4. Add Metadata & Rename Samples
 
 You can upload a metadata file (CSV, TSV, or XLSX) to annotate your samples.
 
@@ -184,10 +242,8 @@ You can upload a metadata file (CSV, TSV, or XLSX) to annotate your samples.
 * **Second Column:** Must be `cancer_type`.
 * **Additional Columns:** Any other annotations (Tissue, Stage, Treatment, etc.).
 
-#### Deep Renaming with Aliases
+### Deep Renaming with Aliases
 If your metadata includes a column named **`sample_name_alias`**, the repository can perform a "Deep Rename." This physically renames the samples in the database and across all internal files (tables, logs, etc.) to match your aliases, making the project much easier for others to navigate.
-
----
 
 ## Need help?
 

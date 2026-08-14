@@ -4,9 +4,7 @@ When you download a project or a selection of samples from AmpliconRepository, y
 
 Your uploaded archive does **not** need to follow this download structure. See [Adding Results to AmpliconRepository](getting-started.md) for the supported input layouts and packaging instructions.
 
----
-
-### Root Directory: `results/`
+## Root Directory: `results/`
 
 The top-level directory contains the following key files:
 
@@ -14,9 +12,7 @@ The top-level directory contains the following key files:
 *   **`aggregated_results.html`**: A searchable, interactive HTML table of your results.
 *   **`run.json`**: A machine-readable JSON file containing all metadata and relative file paths for the project.
 
----
-
-### Sample Data: `samples/`
+## Sample Data: `samples/`
 
 The `samples/` directory contains a subdirectory for every sample in the project. Inside each sample folder (e.g., `samples/sample1/`), you will find:
 
@@ -31,9 +27,7 @@ The `samples/` directory contains a subdirectory for every sample in the project
     *   `sample1.log`: The pipeline execution log for this sample.
     *   `sample1_timing_log.txt`: Performance metrics for the run.
 
----
-
-### Consolidated Analysis: `consolidated_classification/`
+## Consolidated Analysis: `consolidated_classification/`
 
 This directory aggregates results from **AmpliconClassifier (AC)** across all samples in the project, using the project name as a prefix.
 More about these files is available from the [AC GitHub Readme](https://github.com/AmpliconSuite/AmpliconClassifier/blob/main/README.md#3-outputs).
@@ -49,8 +43,6 @@ More about these files is available from the [AC GitHub Readme](https://github.c
     *   **`*_classification_bed_files/`**: Contains BED files for each identified feature.
     *   **`*_SV_summaries/`**: Summaries of structural variants associated with the features.
 
----
+## Other Files: `other_files/`
 
-### Other Files: `other_files/`
-
-If you included supplementary data in an `AUX_DIR` during upload (e.g., FISH images, pathology reports), those files will be consolidated here.
+If you included supplementary files in an `AUX_DIR` during upload (e.g., additional metadata or ID mappings), those files will be consolidated here.

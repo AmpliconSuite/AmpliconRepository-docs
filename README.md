@@ -23,7 +23,7 @@ This project uses Read the Docs for hosting. The configuration is in `.readthedo
 
 - Build OS: Ubuntu 22.04
 - Python: 3.12
-- Theme: rtd-dropdown
+- Theme: Material for MkDocs with AmpliconRepository styling
 
 ## Project Structure
 
