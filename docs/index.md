@@ -16,7 +16,7 @@ AmpliconRepository enables community sharing of focal amplification predictions 
 *   [**Adding Results to AmpliconRepository**](/en/latest/getting-started/): Instructions on packaging and uploading your data.
 *   [**API**](/en/latest/api/): List public projects, inspect metadata, and download project archives from the command line.
 *   [**Analysis Tools**](/en/latest/analysis-tools/): Detailed guide on using the search, filtering, and graph analysis tools.
-*   [**Download Structure**](/en/latest/project-structure/): Description of the schema for project file downloads.
+*   [**Project Archive Structure**](/en/latest/project-structure/): Description of the standardized archive created automatically from uploaded results.
 *   [**FAQ**](/en/latest/faq/): Common questions and troubleshooting.
 *   [**Team & Contributors**](/en/latest/contributors/): The people who have developed and guided AmpliconRepository.
 

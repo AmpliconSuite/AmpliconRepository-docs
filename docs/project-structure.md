@@ -1,6 +1,8 @@
-# Project Structure
+# Project Archive Structure
 
-When you download a project or a selection of samples from AmpliconRepository, you receive a compressed archive (`.tar.gz`). This archive is organized by the **AmpliconSuiteAggregator** into a standardized structure designed for both human readability and programmatic analysis.
+When you download a project or a selection of samples from AmpliconRepository, you receive a compressed archive (`.tar.gz`) with the standardized structure described below. The site's backend creates this structure automatically by discovering and aggregating results from the loosely organized files you upload.
+
+Your uploaded archive does **not** need to follow this download structure. See [Adding Results to AmpliconRepository](getting-started.md) for the supported input layouts and packaging instructions.
 
 ---
 

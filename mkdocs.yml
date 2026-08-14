@@ -18,9 +18,9 @@ nav:
   - 'index.md'
   - 'AmpliconRepository Homepage': 'https://ampliconrepository.org'
   - Documentation:
-    - 'getting-started.md'
+    - 'Adding Results to AmpliconRepository': 'getting-started.md'
     - 'api.md'
     - 'analysis-tools.md'
-    - 'project-structure.md'
+    - 'Project Archive Structure': 'project-structure.md'
   - 'faq.md'
   - 'Team & Contributors': 'contributors.md'
