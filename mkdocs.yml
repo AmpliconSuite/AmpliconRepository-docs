@@ -5,7 +5,6 @@ theme:
 repo_url: https://github.com/AmpliconSuite/AmpliconRepository-docs
 extra:
   version: 1.0
-site_favicon: favicon/favicon.ico
 plugins:
   - search
 extra_css:
@@ -24,3 +23,4 @@ nav:
     - 'analysis-tools.md'
     - 'project-structure.md'
   - 'faq.md'
+  - 'Team & Contributors': 'contributors.md'
