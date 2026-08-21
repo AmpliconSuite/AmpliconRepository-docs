@@ -50,6 +50,7 @@ nav:
   - Get started:
       - Adding Results: getting-started.md
       - Project Archive Structure: project-structure.md
+      - Sample Download Structure: /project-structure/#sample-download-structure
   - Use the repository:
       - API Reference: api.md
       - Analysis Tools: analysis-tools.md

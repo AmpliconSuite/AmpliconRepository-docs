@@ -1,6 +1,6 @@
 # Project Archive Structure
 
-When you download a project or a selection of samples from AmpliconRepository, you receive a compressed archive (`.tar.gz`) with the standardized structure described below. The site's backend creates this structure automatically by discovering and aggregating results from the loosely organized files you upload.
+When you download an entire project from AmpliconRepository, you receive a compressed archive (`.tar.gz`) with the standardized structure described below. The site's backend creates this structure automatically by discovering and aggregating results from the loosely organized files you upload.
 
 Your uploaded archive does **not** need to follow this download structure. See [Adding Results to AmpliconRepository](getting-started.md) for the supported input layouts and packaging instructions.
 
@@ -21,7 +21,7 @@ The `samples/` directory contains a subdirectory for every sample in the project
     *   **`*_cycles.txt` & `*_graph.txt`**: The bioinformatic reconstructions of each amplicon.
     *   **`*.pdf` & `*.png`**: Visualizations of the amplicon structures.
 *   **`sample1_cnvkit_output.tar.gz`**: A compressed archive of the CNVkit results.
-*   **`sample1_CNV_CALLS.bed`**: An uncompressed BED file containing the copy number calls used by AA.
+*   **`sample1_CNV_CALLS.bed`**: An uncompressed BED file containing the whole-genome copy number calls used to identify candidate focal amplification regions; AA independently re-estimates copy number within those regions.
 *   **Metadata & Logs**:
     *   `sample1_run_metadata.json` / `sample1_sample_metadata.json`
     *   `sample1.log`: The pipeline execution log for this sample.
@@ -46,3 +46,36 @@ More about these files is available from the [AC GitHub Readme](https://github.c
 ## Other Files: `other_files/`
 
 If you included supplementary files in an `AUX_DIR` during upload (e.g., additional metadata or ID mappings), those files will be consolidated here.
+
+## Sample Download Structure
+
+The **Download sample** action on a sample page creates a `.zip` file containing that sample's available results. Unlike a project download, the sample files are placed directly at the root of the archive:
+
+```text
+sample1.zip
+├── sample1_result_data.tsv
+├── sample1_sample_metadata.json
+├── sample1_CNV_CALLS.bed
+├── <reconstruction-directory>.tar.gz
+├── sample1_amplicon1_graph.txt
+├── sample1_amplicon1_cycles.txt
+├── sample1_classification_bed_files/
+│   └── <feature_id>.bed
+└── sample1_sashimi_plots/
+    ├── sample1_amplicon1.png
+    ├── sample1_amplicon1.pdf
+    ├── sample1_amplicon1_cycles.png
+    └── sample1_amplicon1_cycles.pdf
+```
+
+The archive contents depend on which results are available for the sample:
+
+*   **`*_result_data.tsv`**: One row per classified feature. File-reference columns contain relative paths to the corresponding files in the ZIP.
+*   **`*_sample_metadata.json`**: Sample-level metadata.
+*   **`*_CNV_CALLS.bed`**: Whole-genome copy number calls used to identify candidate focal amplification regions. AA independently re-estimates copy number within those regions and does not use these calls internally.
+*   **`*_classification_bed_files/`**: One BED file per classified feature.
+*   **`*_sashimi_plots/`**: Available graph and cycle visualizations in PNG and PDF formats.
+*   **`*_graph.txt` and `*_cycles.txt`**: Available reconstruction graph and cycle files.
+*   **`<reconstruction-directory>.tar.gz`**: The complete AA or CoRAL reconstruction-results directory. Newer projects preserve the original directory name; older projects may use `aa_directory.tar.gz`.
+
+Batch sample downloads contain the same per-sample files, nested as `<project_name>/<sample_name>/` within a `batch_samples_<timestamp>.zip` archive.
