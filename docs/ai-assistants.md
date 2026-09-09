@@ -76,10 +76,10 @@ is worth knowing how to spot it:
 
 Two related habits worth asking for:
 
-- **Check the spelling used.** `lung` and `Lung` are separate metadata values,
-  as are `Breast` and `Breast Adenocarcinoma`. An assistant should read
-  `/features/facets/` and query the spellings it finds there rather than
-  guessing.
+- **Check the spelling used.** Case is folded for you, but granularity is not:
+  `Breast` and `Breast Adenocarcinoma` are separate values covering overlapping
+  samples. An assistant should read `/features/facets/` and query the spellings
+  it finds there rather than guessing.
 - **Treat `NA` as a value, not a gap.** It means the submitter recorded "not
   applicable". It is filterable, and it is common.
 

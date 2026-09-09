@@ -153,10 +153,11 @@ returns exactly the count shown.
     what no filter on that field can see. Report it alongside any number you
     derive.
 
-    Two more consequences. `lung` and `Lung` are separate values, as are
-    `Breast` and `Breast Adenocarcinoma` — matching is case-insensitive but
-    granularity is not, so query the spellings the facets endpoint actually
-    lists. And `NA` is a recorded value meaning "not applicable", not a gap.
+    Two more consequences. Case is folded for you, so `lung` and `Lung` are one
+    facet entry with one count — but granularity is not: `Breast` and `Breast
+    Adenocarcinoma` are separate values over overlapping samples, so query the
+    spellings the facets endpoint actually lists. And `NA` is a recorded value
+    meaning "not applicable", not a gap.
 
 ## Machine-readable specification
 
