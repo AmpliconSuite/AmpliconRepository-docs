@@ -53,6 +53,7 @@ nav:
       - Sample Download Structure: /project-structure/#sample-download-structure
   - Use the repository:
       - API Reference: api.md
+      - AI Assistants: ai-assistants.md
       - Analysis Tools: analysis-tools.md
   - Help & project:
       - FAQ: faq.md
