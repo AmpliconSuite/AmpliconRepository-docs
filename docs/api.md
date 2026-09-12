@@ -10,6 +10,27 @@ Base URL:
 https://ampliconrepository.org/api/v1
 ```
 
+!!! tip "You may not need to read this page"
+
+    If you are working with an AI assistant, give it this link and ask your
+    question in plain English:
+
+    ```
+    https://ampliconrepository.org/llms.txt
+    ```
+
+    That file is written for an AI agent rather than a person. It describes
+    every endpoint, the traps that produce confidently wrong answers, and the
+    conventions this API follows, and it points at the machine-readable
+    specification. Assistants that can fetch a URL can go from *"how many
+    glioblastoma samples here carry ecDNA?"* to the right query without your
+    help.
+
+    Check the answer the way you would check a colleague's: ask which endpoint
+    and filters it used, and whether the denominator counts samples or
+    amplicons. [Use AmpliconRepository with an AI assistant](ai-assistants.md)
+    covers what to ask for.
+
 ## Endpoint quick reference
 
 | Method | Endpoint | Auth | Purpose |
@@ -18,9 +39,11 @@ https://ampliconrepository.org/api/v1
 | `GET` | `/projects/?name=<substr>` | optional | Same, filtered by case-insensitive name substring |
 | `GET` | `/projects/<id>/` | optional | Project metadata |
 | `GET` | `/projects/<id>/samples/` | optional | Sample-level metadata for a project |
+| `GET` | `/projects/<id>/samples/<name>/` | optional | One sample's rows |
 | `GET` | `/projects/<id>/download/` | optional | Download the project `.tar.gz` (302-redirects to storage) |
 | `POST` | `/projects/download/` | optional | Resolve several project IDs to download URLs in one call |
 | `GET` | `/features/` | optional | Search every amplicon in the repository at once |
+| `GET` | `/features/samples/` | optional | The same search, one entry per sample instead of per amplicon |
 | `GET` | `/features/facets/` | optional | The values `/features/` can be filtered on, with counts |
 | `GET`/`POST`/`DELETE` | `/token/` | required | Inspect, regenerate, or revoke your API token |
 | `GET` | `/openapi.json` | none | Machine-readable specification of every endpoint |
@@ -66,16 +89,32 @@ curl -s "$BASE/features/?gene_all=MYC,PVT1&same_amp=true"
 curl -s "$BASE/features/?gene_any=EGFR&count_only=true"
 ```
 
-The response is `{"count": N, "results": [...], "next_cursor": "...",
-"reference_builds": {...}}`. Page by passing the returned `next_cursor` back as
-`?cursor=`. Each row carries:
+The response is `{"count": N, "sample_count": M, "results": [...],
+"next_cursor": "...", "reference_builds": {...}}`. Page by passing the returned
+`next_cursor` back as `?cursor=`. Each row carries:
 
 `project_id`, `project_name`, `project_url`, `sample_name`, `sample_url`,
-`feature_id`, `classification`, `genes`, `oncogenes`, `locations`,
-`reference_build`, `cancer_type`, `sample_type`, `tissue_of_origin`.
+`sample_page_url`, `feature_id`, `classification`, `genes`, `oncogenes`,
+`locations`, `reference_build`, `cancer_type`, `sample_type`,
+`tissue_of_origin`.
+
+`sample_url` fetches that one sample's rows; `sample_page_url` is the
+human-readable page, which is what to cite or hand to a colleague.
 
 Use `?fields=` to ask for a subset — `genes` and `locations` are large, and
 omitting them makes a bulk pull much smaller.
+
+!!! warning "`count` counts amplicons; `sample_count` counts samples"
+
+    Most samples carry several rows, and some carry over a hundred, so the two
+    numbers are not interchangeable and the gap is big enough to change a
+    conclusion. Any "what fraction of samples" question wants `sample_count`
+    on both sides of the fraction.
+
+    Do not try to recover it by deduplicating `sample_name` in the results —
+    a sample is identified by **project and name together**, and thousands of
+    names in this repository occur in more than one project (`COLO320DM` is in
+    four). Deduplicating on the name alone silently merges different samples.
 
 !!! warning "Not every row is an amplicon"
 
@@ -96,7 +135,8 @@ omitting them makes a bulk pull much smaller.
 | `oncogenes_only` | Match against the oncogene list rather than all genes |
 | `classification` | `ecDNA`, `BFB`, `Linear`, … — see `/features/facets/` |
 | `cancer_type`, `sample_type`, `tissue_of_origin` | Free-text sample metadata |
-| `project_id`, `project_name`, `sample_name` | Restrict to a project or sample |
+| `project_id`, `project_name`, `sample_name` | Restrict to a project or sample. `sample_name` is exact, with case folded for you |
+| `sample_name_contains` | Case-insensitive substring of the sample name — see [Finding a sample by name](#finding-a-sample-by-name) |
 | `reference_build` | `hg38`, `hg19`, `mm10` |
 | `limit`, `cursor`, `fields`, `count_only` | Paging and response shape |
 
@@ -110,6 +150,64 @@ curl -s "$BASE/features/?tissue_of_origin=Lung&tissue_of_origin=lung"
 
 An unrecognised parameter is a `400` naming the ones that exist, so a `200`
 always means your filter was applied.
+
+## One entry per sample
+
+`GET /features/samples/` takes every filter `/features/` takes and answers at
+sample granularity instead of amplicon granularity:
+
+```bash
+# Which samples carry MYC on ecDNA, rather than which amplicons do
+curl -s "$BASE/features/samples/?gene_any=MYC&classification=ecDNA"
+```
+
+```json
+{
+  "count": 412,
+  "results": [
+    {
+      "project_id": "6a5e...",
+      "project_name": "CCLE",
+      "sample_name": "U2OS_BONE",
+      "reference_build": "hg38",
+      "row_count": 4,
+      "amplicon_count": 4,
+      "classifications": ["BFB", "ecDNA"],
+      "project_url": "...", "sample_url": "...", "sample_page_url": "..."
+    }
+  ],
+  "next_cursor": null
+}
+```
+
+`count` is the number of matching samples, and it always equals `sample_count`
+from the same query against `/features/`. `amplicon_count` of `0` means the
+sample was analysed and nothing focal was found — a result, not a gap.
+
+## Finding a sample by name
+
+`sample_name=` is an **exact** match, with case folded for you. There is no
+need to lowercase, strip punctuation, or fetch a whole project to search it
+client-side.
+
+For a name you only half know — the same cell line may be recorded here as
+`U2OS_BONE`, or with a clone suffix like `G-292_clone_A141B1` —
+`sample_name_contains=` is a plain case-insensitive substring. It is literal
+text: no wildcards, no operators.
+
+```bash
+curl -s "$BASE/features/samples/?sample_name_contains=U2OS"
+```
+
+!!! danger "A name that contains another name is a different sample"
+
+    `HOS` and `HOS-MNNG` are different cell lines, and hundreds of sample
+    names in this repository are a prefix of another one (`COLO320` is a
+    prefix of five). Substring and prefix matching will happily merge them.
+
+    So resolve names through `/features/samples/`, look at the candidates it
+    returns, and decide which one you meant — then query that exact
+    `sample_name`. Summing the matches is almost never right.
 
 ## What you can filter on
 
@@ -153,6 +251,11 @@ returns exactly the count shown.
     what no filter on that field can see. Report it alongside any number you
     derive.
 
+    Per project, the project object answers the same question directly:
+    `metadata_coverage` gives the fraction of that project's rows carrying
+    each of the three fields. A `0.0` means the project recorded none of it,
+    so a filter on that field returns an empty result that is not an answer.
+
     Two more consequences. Case is folded for you, so `lung` and `Lung` are one
     facet entry with one count — but granularity is not: `Breast` and `Breast
     Adenocarcinoma` are separate values over overlapping samples, so query the
@@ -178,7 +281,11 @@ Anyone can list public AmpliconRepository projects. No login or token is require
 curl -s "$BASE/projects/"
 ```
 
-The response is a JSON array. Each project includes `project_name`, `id`, `sample_count`, `visibility`, `description`, `reference_genome`, and more. Use the `id` value when downloading a project.
+The response is a JSON array. Each project includes `project_name`, `id`, `sample_count`, `visibility`, `description`, `reference_genome`, `metadata_coverage`, and more. Use the `id` value when downloading a project.
+
+`description` is worth reading before you query: it is written by whoever
+submitted the project and states the cohort, the paper and the selection
+criteria — context that appears nowhere in the feature rows.
 
 If `jq` is installed, print a simple project-name list:
 
@@ -214,7 +321,9 @@ curl -sS -L -o "${PROJECT_ID}.tar.gz" "$BASE/projects/${PROJECT_ID}/download/"
 - `-L` is **required**: production downloads 302-redirect to a short-lived storage URL.
 - `-o <filename>` names the output file. Do **not** use `curl -O` here — the endpoint URL ends in `/download/` and carries no filename for curl to derive, so `-O` fails with `curl: (23) Failed writing received data to disk`.
 
-The downloaded file is a `.tar.gz` archive containing the project output packaged by AmpliconSuiteAggregator. Inside, `results/aggregated_results.csv` holds the combined per-feature table.
+The downloaded file is a `.tar.gz` archive containing the project output packaged by AmpliconSuiteAggregator. Inside, `results/aggregated_results.csv` holds the combined per-feature table; see [Project Archive Structure](project-structure.md) for the rest.
+
+Archives are large, and for the big projects they are several gigabytes. If you are answering a question about genes, classifications or metadata, `/features/` already answers it without the download.
 
 ## Private projects
 

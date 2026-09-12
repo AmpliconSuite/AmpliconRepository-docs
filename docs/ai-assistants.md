@@ -37,10 +37,12 @@ once — no need to find a project first.
 | Are MYC and PVT1 on the *same* amplicon? | `/api/v1/features/?gene_all=MYC,PVT1&same_amp=true` |
 | How many EGFR amplifications are there? | `/api/v1/features/?gene_any=EGFR&count_only=true` |
 | What can I filter on? | `/api/v1/features/facets/` |
+| Which **samples**, not which amplicons? | `/api/v1/features/samples/?gene_any=MYC` |
+| Is the U2OS cell line in here? | `/api/v1/features/samples/?sample_name_contains=U2OS` |
 
 Every row names its project, sample, feature, classification, genes, oncogenes,
-coordinates, and reference build, and carries `project_url` and `sample_url` so
-the assistant can cite what it used. See the
+coordinates, and reference build, and carries `project_url`, `sample_url` and
+`sample_page_url` so the assistant can cite what it used. See the
 [API Reference](api.md) for the full parameter list, or fetch
 [`/api/v1/openapi.json`](https://ampliconrepository.org/api/v1/openapi.json)
 for the machine-readable specification.
@@ -74,8 +76,36 @@ is worth knowing how to spot it:
     alongside the per-value counts precisely so an assistant can compare the
     two and report the shortfall.
 
+!!! warning "Rows are amplicons; the denominator is usually samples"
+
+    Most samples carry several rows and some carry over a hundred, so a
+    percentage computed from row counts is not a percentage of samples. Every
+    search response carries `sample_count` next to `count`; a good answer uses
+    it for both halves of any fraction of samples.
+
+    The related trap is on the way in: an assistant that deduplicates
+    `sample_name` itself will merge distinct samples, because thousands of
+    names here occur in more than one project. Identity is project **and**
+    name.
+
+!!! warning "A cell line's name here may not be the name you know"
+
+    The same line can be recorded as `U2OS_BONE`, or with a clone suffix like
+    `G-292_clone_A141B1`. `sample_name_contains=` finds those, but a substring
+    match is not an identity: `HOS` matches `HOS-MNNG`, which is a different
+    line, and hundreds of names here are a prefix of another.
+
+    Ask for `/api/v1/features/samples/?sample_name_contains=...` and for the
+    candidate list it returned, so you can see which sample the answer is
+    actually about.
+
 Two related habits worth asking for:
 
+- **Ask which project, and check its coverage.** Each project object carries
+  `metadata_coverage`; a `0.0` for `cancer_type` means that project recorded
+  none, so filtering it by cancer type could only ever return nothing. Its
+  `description` also states the cohort and the paper, which is context worth
+  quoting.
 - **Check the spelling used.** Case is folded for you, but granularity is not:
   `Breast` and `Breast Adenocarcinoma` are separate values covering overlapping
   samples. An assistant should read `/features/facets/` and query the spellings
