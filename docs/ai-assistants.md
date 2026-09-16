@@ -41,8 +41,10 @@ once — no need to find a project first.
 | Is the U2OS cell line in here? | `/api/v1/features/samples/?sample_name_contains=U2OS` |
 
 Every row names its project, sample, feature, classification, genes, oncogenes,
-coordinates, and reference build, and carries `project_url`, `sample_url` and
-`sample_page_url` so the assistant can cite what it used. See the
+coordinates, and reference build, carries the feature's copy number (maximum
+and median), complexity score and captured interval length, and carries
+`project_url`, `sample_url` and `sample_page_url` so the assistant can cite
+what it used. See the
 [API Reference](api.md) for the full parameter list, or fetch
 [`/api/v1/openapi.json`](https://ampliconrepository.org/api/v1/openapi.json)
 for the machine-readable specification.
@@ -51,6 +53,14 @@ for the machine-readable specification.
 
 The repository's amplicon calls — classification, genes, coordinates,
 reference build — are computed for every sample and are complete.
+
+**The copy number on a row is the amplification's, not any gene's.** A
+feature spans segments at different copy numbers, so `feature_max_copy_number`
+is an upper bound on the copy number of any one gene on it. An assistant asked
+to plot "EGFR copy number" should say which it plotted. The per-gene value is
+in the project archive (`*_gene_list.tsv`, column `gene_cn`), and `llms.txt`
+tells the assistant so — see
+[What only the archive holds](api.md#what-only-the-archive-holds).
 
 **But not every row is an amplicon.** A sample the pipeline analysed and found
 clean is kept as a result, with `classification: "None"` and no genes, and

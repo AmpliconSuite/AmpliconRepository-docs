@@ -29,12 +29,12 @@ The `samples/` directory contains a subdirectory for every sample in the project
 
 ## Consolidated Analysis: `consolidated_classification/`
 
-This directory aggregates results from **AmpliconClassifier (AC)** across all samples in the project, using the project name as a prefix.
+This directory aggregates results from **AmpliconClassifier (AC)** across all samples in the project, using the project name as a prefix. Projects submitted before the aggregator standardised this layout do not have it: their AC output sits wherever the submitter's run wrote it (often under `other_files/`), sometimes one set per sample. When reading an archive programmatically, find these files by name rather than by path.
 More about these files is available from the [AC GitHub Readme](https://github.com/AmpliconSuite/AmpliconClassifier/blob/main/README.md#3-outputs).
 
 *   **`*_result_table.tsv`**: The authoritative list of all focal amplifications identified across the project.
 *   **`*_amplicon_classification_profiles.tsv`**: Detailed profiles for each identified amplicon.
-*   **`*_gene_list.tsv`**: A comprehensive list of genes associated with each identified feature.
+*   **`*_gene_list.tsv`**: Every gene on every identified feature, with its own copy number (`gene_cn`) and whether either end of it is truncated. This is the only place per-gene copy number is recorded; the API and `aggregated_results.csv` carry the feature's copy number, not the gene's.
 *   **`*_ecDNA_counts.tsv`**: Summary counts of ecDNA identified in the project.
 *   **`*_ecDNA_context_calls.tsv`**: Data regarding the genomic context of identified ecDNA.
 *   **`*_feature_basic_properties.tsv` & `*_feature_entropy.tsv`**: Metrics regarding the complexity and properties of identified features.

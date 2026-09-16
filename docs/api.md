@@ -95,8 +95,24 @@ The response is `{"count": N, "sample_count": M, "results": [...],
 
 `project_id`, `project_name`, `project_url`, `sample_name`, `sample_url`,
 `sample_page_url`, `feature_id`, `classification`, `genes`, `oncogenes`,
-`locations`, `reference_build`, `cancer_type`, `sample_type`,
-`tissue_of_origin`.
+`locations`, `reference_build`, `feature_max_copy_number`,
+`feature_median_copy_number`, `complexity_score`, `captured_interval_length`,
+`cancer_type`, `sample_type`, `tissue_of_origin`.
+
+The four numbers are AmpliconClassifier's per-feature results — the same
+values as the "Feature maximum copy number", "Feature median copy number",
+"Complexity score" and "Captured interval length" columns of its results
+table — so a plot of copy number against class or gene needs no download.
+They are `null` on rows that carry no amplicon.
+
+!!! warning "The copy number is the amplification's, not any gene's"
+
+    A feature spans genomic segments at different copy numbers, and a gene on
+    one of the lower segments has a lower copy number than the feature's
+    maximum. For "the copy number of EGFR in these samples",
+    `feature_max_copy_number` is an upper bound. The per-gene value is in the
+    project archive, not the API — see
+    [What only the archive holds](#what-only-the-archive-holds).
 
 `sample_url` fetches that one sample's rows; `sample_page_url` is the
 human-readable page, which is what to cite or hand to a colleague.
@@ -324,6 +340,42 @@ curl -sS -L -o "${PROJECT_ID}.tar.gz" "$BASE/projects/${PROJECT_ID}/download/"
 The downloaded file is a `.tar.gz` archive containing the project output packaged by AmpliconSuiteAggregator. Inside, `results/aggregated_results.csv` holds the combined per-feature table; see [Project Archive Structure](project-structure.md) for the rest.
 
 Archives are large, and for the big projects they are several gigabytes. If you are answering a question about genes, classifications or metadata, `/features/` already answers it without the download.
+
+### What only the archive holds
+
+The API reports each feature's summary. The archive is the complete
+AmpliconSuite output the submitter uploaded, and it holds what the API does
+not. Decide from this list whether a question needs the download:
+
+- **Per-gene copy number and truncation** — `*_gene_list.tsv`, columns
+  `gene_cn` and `truncated`. A search row's `feature_id` is that file's
+  `sample_name`, `amplicon_number` and `feature` columns joined with
+  underscores, so the two join directly.
+- **The reconstruction itself** — `*_cycles.txt` (the segments, their copy
+  numbers, and the paths and cycles AmpliconArchitect assembled from them)
+  and `*_graph.txt` (the breakpoint graph), one pair per amplicon.
+- **Feature intervals as BED** — `*_classification_bed_files/`, one file per
+  feature. Absent from some older archives.
+- **Per-amplicon classification detail** —
+  `*_amplicon_classification_profiles.tsv` and `*_SV_summaries/`.
+- **Genome-wide copy number** — each sample's `*_CNV_CALLS.bed`, when the
+  submitter included it.
+- **Figures** — AmpliconArchitect's amplicon plots as PNG and PDF.
+
+The
+[AmpliconClassifier README](https://github.com/AmpliconSuite/AmpliconClassifier/blob/main/README.md#3-outputs)
+defines every file and column. Find files with a glob under `results/`:
+archives built by the current aggregator put one gene list at
+`results/consolidated_classification/` and each sample's cycles under
+`results/samples/<sample>/`; projects submitted before the layout was
+standardised keep them wherever the submitter's run wrote them, sometimes one
+gene list per sample. Skip names starting with `._`, macOS resource forks some
+uploads carry.
+
+```bash
+tar -xzf "${PROJECT_ID}.tar.gz"
+find results -name '*_gene_list.tsv' | xargs awk -F'\t' '$4 == "EGFR" {print FILENAME, $1, $2, $3, $5}'
+```
 
 ## Private projects
 
