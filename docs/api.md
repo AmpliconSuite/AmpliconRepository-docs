@@ -343,26 +343,34 @@ Archives are large, and for the big projects they are several gigabytes. If you 
 
 ### What only the archive holds
 
-The API reports a summary of each amplicon. The archive is the complete
-AmpliconSuite output the submitter uploaded — for every sample,
-AmpliconArchitect's reconstruction and the whole of AmpliconClassifier's
-output — and the
-[AmpliconClassifier README](https://github.com/AmpliconSuite/AmpliconClassifier/blob/main/README.md#3-outputs)
-defines every file and column. Two questions only the archive answers:
+The API reports each feature's summary. The archive is the complete
+AmpliconSuite output the submitter uploaded, and it holds what the API does
+not. Decide from this list whether a question needs the download:
 
-- **Per-gene copy number and truncation.** `*_gene_list.tsv`, columns
+- **Per-gene copy number and truncation** — `*_gene_list.tsv`, columns
   `gene_cn` and `truncated`. A search row's `feature_id` is that file's
   `sample_name`, `amplicon_number` and `feature` columns joined with
   underscores, so the two join directly.
-- **The amplicon's structure.** `*_cycles.txt` (the reconstructed paths and
-  cycles, with their copy numbers) and `*_graph.txt` (the breakpoint graph),
-  one pair per AmpliconArchitect amplicon.
+- **The reconstruction itself** — `*_cycles.txt` (the segments, their copy
+  numbers, and the paths and cycles AmpliconArchitect assembled from them)
+  and `*_graph.txt` (the breakpoint graph), one pair per amplicon.
+- **Feature intervals as BED** — `*_classification_bed_files/`, one file per
+  feature. Absent from some older archives.
+- **Per-amplicon classification detail** —
+  `*_amplicon_classification_profiles.tsv` and `*_SV_summaries/`.
+- **Genome-wide copy number** — each sample's `*_CNV_CALLS.bed`, when the
+  submitter included it.
+- **Figures** — AmpliconArchitect's amplicon plots as PNG and PDF.
 
-Find them with a glob under `results/`. Archives built by the current
-aggregator put one gene list at `results/consolidated_classification/` and
-each sample's cycles under `results/samples/<sample>/`; projects submitted
-before the layout was standardised keep them wherever the submitter's run
-wrote them, sometimes one gene list per sample.
+The
+[AmpliconClassifier README](https://github.com/AmpliconSuite/AmpliconClassifier/blob/main/README.md#3-outputs)
+defines every file and column. Find files with a glob under `results/`:
+archives built by the current aggregator put one gene list at
+`results/consolidated_classification/` and each sample's cycles under
+`results/samples/<sample>/`; projects submitted before the layout was
+standardised keep them wherever the submitter's run wrote them, sometimes one
+gene list per sample. Skip names starting with `._`, macOS resource forks some
+uploads carry.
 
 ```bash
 tar -xzf "${PROJECT_ID}.tar.gz"
